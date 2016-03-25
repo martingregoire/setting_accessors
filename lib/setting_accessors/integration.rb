@@ -13,7 +13,6 @@ module SettingAccessors::Integration
   end
 
   module ClassMethods
-
     #
     # Generates a new accessor (=getter and setter) for the given setting
     #
@@ -45,13 +44,13 @@ module SettingAccessors::Integration
 
       setting_type = SettingAccessors::Internal.setting_value_type(setting_name, self.new).to_sym
 
-      #Create a virtual column in the models column hash.
-      #This is currently not absolutely necessary, but will become important once
-      #Time etc. are supported. Otherwise, Rails won't be able to e.g. automatically
-      #create multi-param fields in forms.
+      # Create a virtual column in the models column hash.
+      # This is currently not absolutely necessary, but will become important once
+      # Time etc. are supported. Otherwise, Rails won't be able to e.g. automatically
+      # create multi-param fields in forms.
       self.columns_hash[setting_name.to_s] = OpenStruct.new(type: setting_type)
 
-      #Add the setting's name to the list of setting_accessors for this class
+      # Add the setting's name to the list of setting_accessors for this class
       SettingAccessors::Internal.add_setting_accessor_name(self, setting_name)
 
       # Getter
@@ -67,28 +66,37 @@ module SettingAccessors::Integration
         settings[setting_name] = new_value
       end
 
-      #NAME_was
+      # NAME_was
       define_method("#{setting_name}_was") do
         settings.value_was(setting_name, fallback)
       end
 
-      #NAME_before_type_cast
+      # NAME_before_type_cast
       define_method("#{setting_name}_before_type_cast") do
         settings.value_before_type_cast(setting_name)
       end
 
-      #NAME_changed?
+      # NAME_changed?
       define_method("#{setting_name}_changed?") do
         settings.value_changed?(setting_name)
       end
     end
   end
 
-  def as_json(*args)
-    json = super(*args)
+  #
+  # The hash returned by as_json by default contains the names and values of all
+  # attributes. As class-specific settings are handled as attributes in other
+  # situations, they have to be added to the json result as well.
+  #
+  # @return [Hash]
+  #
+  def as_json(*)
+    json = super
+
     SettingAccessors::Internal.setting_accessor_names(self.class).each do |setting_name|
       json[setting_name.to_s] = send(setting_name)
     end
+
     json
   end
 

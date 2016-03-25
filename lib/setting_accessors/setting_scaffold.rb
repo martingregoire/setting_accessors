@@ -201,8 +201,8 @@ module SettingAccessors::SettingScaffold
   # @return [String] the setting's type as specified in settings.yml
   #   If the setting wasn't specified, a polymorphic type is assumed
   #
-  def value_type
-    data['type'] || 'polymorphic'
+  def type
+    data.try(:type) || 'polymorphic'
   end
 
   #
@@ -228,7 +228,7 @@ module SettingAccessors::SettingScaffold
   private
 
   def converter
-    @converter ||= SettingAccessors::Internal.converter(value_type)
+    @converter ||= SettingAccessors::Internal.converter(type)
   end
 
   def value_required?
@@ -239,14 +239,14 @@ module SettingAccessors::SettingScaffold
   # Accessor to the validations part of the setting's data
   #
   def validations
-    data['validates'] || {}
+    data.try(:validates) || {}
   end
 
   #
-  # @see {SettingAccessors::Internal#setting_data} for more information
+  # @see {SettingAccessors::Configuration::Base#setting} for more information
   #
   def data
-    SettingAccessors::Internal.setting_data(name, assignable)
+    SettingAccessors.configuration.setting(name, assignable)
   end
 
 end

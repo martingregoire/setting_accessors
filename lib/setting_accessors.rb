@@ -1,4 +1,8 @@
+require 'pathname'
+require 'active_support/all'
+
 require 'setting_accessors/version'
+require 'setting_accessors/configuration/base'
 require 'setting_accessors/accessor'
 require 'setting_accessors/converter'
 require 'setting_accessors/integration'
@@ -12,15 +16,19 @@ ActiveRecord::Base.class_eval do
 end
 
 module SettingAccessors
-  def self.setting_class
-    self.setting_class_name.constantize
+  def self.root
+    Pathname.new(File.expand_path(File.join(File.dirname(__FILE__), '..')))
   end
 
-  def self.setting_class=(klass)
-    @@setting_class = klass.to_s
+  def self.lib
+    self.root.join('lib')
   end
 
-  def self.setting_class_name
-    (@@setting_class ||= 'Setting').camelize
+  def self.configuration
+    @configuration ||= SettingAccessors::Configuration::Base.new
+  end
+
+  def self.configure
+    yield configuration
   end
 end

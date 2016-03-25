@@ -18,16 +18,9 @@ module SettingAccessors
 
       desc 'Installs everything necessary'
       def create_install
-        template 'settings.yml', 'config/settings.yml'
         template 'model.rb.erb', "app/models/#{model_name.classify.underscore}.rb"
+        template 'initializer.rb.erb', 'config/initializers/setting_accessors.rb'
         migration_template 'migration.rb.erb', "db/migrate/create_#{model_name.classify.underscore.pluralize}.rb"
-
-        initializer 'setting_accessors.rb', <<INIT
-#The model your application is using for settings.
-#If you created it using the SettingAccessors generator, the
-#model name below should already be correct.
-SettingAccessors.setting_class = #{model_name}
-INIT
       end
     end
   end

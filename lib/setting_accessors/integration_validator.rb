@@ -8,6 +8,9 @@
 # for Rails' validation chain
 #
 
+require 'active_record'
+require 'active_model'
+
 class SettingAccessors::IntegrationValidator < ActiveModel::Validator
   def validate(record)
     record.settings.send(:validate!)

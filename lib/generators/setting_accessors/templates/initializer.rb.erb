@@ -1,0 +1,9 @@
+SettingAccessors.configure do |config|
+  config.setting_class = '<%= model_name.camelize %>'
+
+  config.global_setting(:a_string) do |setting|
+    setting.type = 'string'
+    setting.default = 'I am a string!'
+  end
+end
+
